@@ -1,168 +1,206 @@
 /* Combined Macro Measures distance between target and character. Rolls xd12 removing matches between attacker roll and defender roll. Plays special effects on roll*/
-
-  const tokens = canvas.tokens.controlled;
-    if (tokens.length == 0) {
-        ui.notifications.error("Please Target a token and then select the Attacker token");
-        return;
-    }
+//Red2
+const tokens = canvas.tokens.controlled;
+if (tokens.length == 0) {
+    ui.notifications.error("Please Target a token and then select the Attacker token");
+    return;
+}
 ui.notifications.info(`${actor.data.name} Is rolling an attack`)
-
 let targettoken = Array.from(game.user.targets)[0];
 let maintoken = canvas.tokens.controlled[0];
 
 function tokenDistance(token1, token2)
 {
-  if(!token1 || !token2) return;
+if(!token1 || !token2) return;
 
-  let distance = canvas.grid.measureDistance(token1, token2);
-  if(token1.elevation !== token2.data.elevation)
-  {
-    let h_diff = token2.data.elevation > token1.data.elevation 
-      ? token2.data.elevation - token1.data.elevation 
-      : token1.data.elevation - token2.data.elevation;
+let distance = canvas.grid.measureDistance(token1, token2);
+if(token1.elevation !== token2.data.elevation)
+{
+let h_diff = token2.data.elevation > token1.data.elevation 
+  ? token2.data.elevation - token1.data.elevation 
+  : token1.data.elevation - token2.data.elevation;
 
-    return Math.floor(Math.sqrt(Math.pow(h_diff,2) + Math.pow(distance,2)));
-  }else{
-    return Math.floor(distance);
-  }
+return Math.floor(Math.sqrt(Math.pow(h_diff,2) + Math.pow(distance,2)));
+}else{
+return Math.floor(distance);
+}
 }
 let chatData = {
-            user: game.user._id,
-            content: `${tokenDistance(maintoken, targettoken)} inches between the two tokens.`
-        };
+        user: game.user._id,
+        content: `${tokenDistance(maintoken, targettoken)} inches between the two tokens.`
+    };
 ChatMessage.create(chatData, {});
 
+
 let content =     "\n <div class='form-group dialog layer-settings'>" +
-                  "\n <label>Dice for attacker:</label> <input type='number' name='attacker-dice' value=0 />"+
-                  "\n <label>Dice for defender:</label> <input type='number' name='defender-dice' value=0 />"+ 
-                  "\n <label>Target:</label> <input type='number' name='target' value= 0 />"
-                  "\n </div>"
+              "\n <label>Dice for attacker:</label> <input type='number' name='attacker-dice' value=0 />"+
+              "\n <label>Dice for defender:</label> <input type='number' name='defender-dice' value=0 />"+ 
+              "\n <label>Target:</label> <input type='number' name='target' value= 0 />"
+              "\n </div>"
 let d = new Dialog({
-    title: "Attack",
-    content: content,
-    buttons: {
-      no: {
-            icon: "<i class=\"fas fa-times\"></i>",
-            label: "Cancel"
-        },
-     one: {
-      icon: '<i class="fas fa-check"></i>',
-      label: "Roll Attack",
-      callback: html => callback(html)
-     }
+title: "Attack",
+content: content,
+buttons: {
+  no: {
+        icon: "<i class=\"fas fa-times\"></i>",
+        label: "Cancel"
     },
-    default: "one"
-   });
+ one: {
+  icon: '<i class="fas fa-check"></i>',
+  label: "Roll Attack",
+  callback: html => callback(html)
+ }
+},
+default: "one"
+});
 d.render(true);
 
 async function callback(html) {
-    const attackerDice = html.find(".layer-settings.dialog [name='attacker-dice']")[0].value + "d12";
-    const defenderDice = html.find(".layer-settings.dialog [name='defender-dice']")[0].value + "d12";
-    const target = html.find(".layer-settings.dialog [name='target']")[0].value;
-    let attackerRoll = new Roll(attackerDice);
-    let defenderRoll = new Roll(defenderDice);
-    await attackerRoll.roll();
-    await defenderRoll.roll();
-    await attackerRoll.toMessage();
-    await defenderRoll.toMessage();
+const attackerDice = html.find(".layer-settings.dialog [name='attacker-dice']")[0].value + "d12";
+const defenderDice = html.find(".layer-settings.dialog [name='defender-dice']")[0].value + "d12";
+const target = html.find(".layer-settings.dialog [name='target']")[0].value;
+let attackerRoll = new Roll(attackerDice);
+let defenderRoll = new Roll(defenderDice);
+await attackerRoll.roll();
+await defenderRoll.roll();
+await attackerRoll.toMessage();
+await defenderRoll.toMessage();
 async function castSpell(effect) {
-        game.user.targets.forEach((i, t) => {
-        canvas.fxmaster.drawSpecialToward(effect, tokens[0], t);
-    })
+    game.user.targets.forEach((i, t) => {
+    canvas.fxmaster.drawSpecialToward(effect, tokens[0], t);
+})
 }
 castSpell({
-        file: "modules/JB2A_DnD5e/Library/Generic/Weapon_Attacks/Ranged/LazerShot_01_Red_30ft_1600x400.webm",
-    anchor: {
-        x: .1,
-        y: 0.5
-    },
-    speed: 0,
-    angle: 0,
-    scale: {
-    x: 1.0,
-    y: 1.0
+    file: "modules/JB2A_DnD5e/Library/Generic/Weapon_Attacks/Ranged/LaserShot_01_Regular_Red_30ft_1600x400.webm",
+anchor: {
+    x: .1,
+    y: 0.5
+},
+speed: 0,
+angle: 0,
+scale: {
+x: 1.0,
+y: 1.0
 }
 });
 async function playSound({file = ``, volume = 0.8 , wait = 0}={})
 {
-  const wait_fn = async (ms) => new Promise((resolve)=> setTimeout(resolve, ms));
-  /* Play File */
-  if(file)
-  {
-    let audio = AudioHelper.play({src: file, volume, autoplay: true, loop: false}, true);
-    await wait_fn((audio._duration*1000) + wait);
-  }
+const wait_fn = async (ms) => new Promise((resolve)=> setTimeout(resolve, ms));
+/* Play File */
+if(file)
+{
+let audio = AudioHelper.play({src: file, volume, autoplay: true, loop: false}, true);
+await wait_fn((audio._duration*1000) + wait);
 }
-    playSound({ file : `modules/gAudioBundle-4/src/Sci Fi Weapons/Weapon_Shot_Blaster-06.ogg` });
-    let attackPool = attackerRoll.terms[0].results.map(x => x.result);
-    let defencePool = defenderRoll.terms[0].results.map(x=> x.result);
-    for (var defDie of defencePool){
-        if (attackPool.includes(defDie)){
-            attackPool.splice(attackPool.indexOf(defDie),1)
-        }
+}
+playSound({ file : `modules/gAudioBundle-4/src/Sci Fi Weapons/Weapon_Shot_Blaster-06.ogg` });
+let attackPool = attackerRoll.terms[0].results.map(x => x.result);
+let defencePool = defenderRoll.terms[0].results.map(x=> x.result);
+for (var defDie of defencePool){
+    if (attackPool.includes(defDie)){
+        attackPool.splice(attackPool.indexOf(defDie),1)
     }
-    let total = 0;
-    for (var attDie of attackPool){
-        total += attDie
-    }
-    let result = Math.floor(total/target);
-    result += attackPool.filter(a => a === 12).length;
-    result -= defencePool.filter(a => a === 12).length;
-        ChatMessage.create({
-        content: "Attack Total:" + total + " / Target: " + target + " = Successes: " + result
-    })
+}
+
+//Measures distance between attacker and target
+let targettoken = Array.from(game.user.targets)[0];
+let maintoken = canvas.tokens.controlled[0];
+
+function tokenDistance(token1, token2)
+{
+if(!token1 || !token2) return;
+
+let distance = canvas.grid.measureDistance(token1, token2);
+if(token1.elevation !== token2.data.elevation)
+{
+let h_diff = token2.data.elevation > token1.data.elevation 
+  ? token2.data.elevation - token1.data.elevation 
+  : token1.data.elevation - token2.data.elevation;
+
+return Math.floor(Math.sqrt(Math.pow(h_diff,2) + Math.pow(distance,2)));
+}else{
+return Math.floor(distance);
+}
+}
+//this duplicates the messagecreated above - but after the roll - so is redundant
+//let chatData = {
+   //     user: game.user._id,
+    //    content: `${tokenDistance(maintoken, targettoken)} inches between the two tokens.`
+   // };
+//ChatMessage.create(chatData, {});
+
+
+let targettoken1 = Array.from(game.user.targets)[0];
+let maintoken1 = canvas.tokens.controlled[0];
+let targetdefense=targettoken1.actor.data.data.attributes.Defense.value;
+let targetarmor=targettoken1.actor.data.data.attributes.AV1.value;
+let attackmain=maintoken1.actor.data.data.attributes.Fight1.value;
+let tokenDistance1= tokenDistance(maintoken, targettoken);
+
+let total = 0;
+for (var attDie of attackPool){
+    total += attDie
+}
+//let result = Math.floor(total/(target + targetdefense));
+let targettotal=Math.floor(parseInt(target) + parseInt(targetdefense) + parseInt(tokenDistance1));
+let result = Math.floor(total/(targettotal));
+result += attackPool.filter(a => a === 12).length;
+result -= defencePool.filter(a => a === 12).length;
+    ChatMessage.create({
+    content: "Attack Total:" + total + " / Target: " + targettotal + " = Successes: " + result
+})
 }
 let requestedattribute = 'Defense';   // the attribute that we are looking for
 let targets = game.user.targets.ids; // get list of currently selected targets by the current user
 if(targets.length>0) 
 {
-    let target = canvas.tokens.placeables.find(y=>y.id==targets[0]); // this will selected the first targeted token
-    if(target!=null)
-    {
-      // console.log(target.actor.data.data.attributes);  // outputs all attributes to console - for debugging purposes
-      let targetattributes=target.actor.data.data.attributes;
-      if (targetattributes[requestedattribute]!=null)
-      {
-        ui.notifications.info('Targeted token(' + target.actor.name + ') has attribute(' + requestedattribute + ') equal to (' + targetattributes[requestedattribute ].value + ')');
-      }
-      else
-      {
-        ui.notifications.error('Requested attribute (' + requestedattribute + ') not found for targeted token(' + target.actor.name +')');
-      }
-    }
-    else
-    {
-      ui.notifications.error('Error, target not found');
-    }
+let target = canvas.tokens.placeables.find(y=>y.id==targets[0]); // this will selected the first targeted token
+if(target!=null)
+{
+  // console.log(target.actor.data.data.attributes);  // outputs all attributes to console - for debugging purposes
+  let targetattributes=target.actor.data.data.attributes;
+  if (targetattributes[requestedattribute]!=null)
+  {
+    ui.notifications.info('Targeted token(' + target.actor.name + ') has attribute(' + requestedattribute + ') equal to (' + targetattributes[requestedattribute ].value + ')');
+  }
+  else
+  {
+    ui.notifications.error('Requested attribute (' + requestedattribute + ') not found for targeted token(' + target.actor.name +')');
+  }
 }
 else
 {
-  ui.notifications.error('No target selected');
+  ui.notifications.error('Error, target not found');
+}
+}
+else
+{
+ui.notifications.error('No target selected');
 }
 let requestedattributex = 'AV1';   // the attribute that we are looking for
 let targetsx = game.user.targets.ids; // get list of currently selected targets by the current user
 if(targetsx.length>0) 
 {
-    let target = canvas.tokens.placeables.find(y=>y.id==targetsx[0]); // this will selected the first targeted token
-    if(target!=null)
-    {
-      // console.log(target.actor.data.data.attributes);  // outputs all attributes to console - for debugging purposes
-      let targetattributesx=target.actor.data.data.attributes;
-      if (targetattributesx[requestedattributex]!=null)
-      {
-        ui.notifications.info('Targeted token(' + target.actor.name + ') has attribute(' + requestedattributex + ') equal to (' + targetattributesx[requestedattributex ].value + ')');
-      }
-      else
-      {
-        ui.notifications.error('Requested attribute (' + requestedattributex + ') not found for targeted token(' + target.actor.name +')');
-      }
-    }
-    else
-    {
-      ui.notifications.error('Error, target not found');
-    }
+let target = canvas.tokens.placeables.find(y=>y.id==targetsx[0]); // this will selected the first targeted token
+if(target!=null)
+{
+  // console.log(target.actor.data.data.attributes);  // outputs all attributes to console - for debugging purposes
+  let targetattributesx=target.actor.data.data.attributes;
+  if (targetattributesx[requestedattributex]!=null)
+  {
+    ui.notifications.info('Targeted token(' + target.actor.name + ') has attribute(' + requestedattributex + ') equal to (' + targetattributesx[requestedattributex ].value + ')');
+  }
+  else
+  {
+    ui.notifications.error('Requested attribute (' + requestedattributex + ') not found for targeted token(' + target.actor.name +')');
+  }
 }
 else
 {
-  ui.notifications.error('No target selected');
+  ui.notifications.error('Error, target not found');
+}
+}
+else
+{
+ui.notifications.error('No target selected');
 }
