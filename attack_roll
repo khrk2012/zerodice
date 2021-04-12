@@ -1,5 +1,7 @@
 /* Combined Macro Measures distance between target and character. Rolls xd12 removing matches between attacker roll and defender roll. Plays special effects on roll*/
-//Red2
+//macro Red1
+//Red1 hides the dice rolls and only outputs the results to save chat window reality.
+//Red2 shows both dice rolls and shows the distance between target and shooter in the chat window - thi sis mostly for a dice roll audit but can be used as well.
 const tokens = canvas.tokens.controlled;
 if (tokens.length == 0) {
     ui.notifications.error("Please Target a token and then select the Attacker token");
