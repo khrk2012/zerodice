@@ -6,37 +6,19 @@ if (tokens.length == 0) {
     return;
 }
 ui.notifications.info(`${actor.data.name} Is rolling an attack`)
-let targettoken = Array.from(game.user.targets)[0];
-let maintoken = canvas.tokens.controlled[0];
 
-function tokenDistance(token1, token2)
-{
-if(!token1 || !token2) return;
+let maintoken1 = canvas.tokens.controlled[0];
+let attackmain=maintoken1.actor.data.data.attributes.Fight1.value;
+let targettoken2 = Array.from(game.user.targets)[0];
+let targetarmor=targettoken2.actor.data.data.attributes.AV1.value;
 
-let distance = canvas.grid.measureDistance(token1, token2);
-if(token1.elevation !== token2.data.elevation)
-{
-let h_diff = token2.data.elevation > token1.data.elevation 
-  ? token2.data.elevation - token1.data.elevation 
-  : token1.data.elevation - token2.data.elevation;
-
-return Math.floor(Math.sqrt(Math.pow(h_diff,2) + Math.pow(distance,2)));
-}else{
-return Math.floor(distance);
-}
-}
-let chatData = {
-        user: game.user._id,
-        content: `${tokenDistance(maintoken, targettoken)} inches between the two tokens.`
-    };
-ChatMessage.create(chatData, {});
-
-
-let content =     "\n <div class='form-group dialog layer-settings'>" +
-              "\n <label>Dice for attacker:</label> <input type='number' name='attacker-dice' value=0 />"+
-              "\n <label>Dice for defender:</label> <input type='number' name='defender-dice' value=0 />"+ 
-              "\n <label>Target:</label> <input type='number' name='target' value= 0 />"
-              "\n </div>"
+let content = `
+<div class='form-group dialog layer-settings'>
+<label>Dice for attacker:</label> <input type='number' name='attacker-dice' value=${attackmain} />
+<label>Dice for defender's armor:</label> <input type='number' name='defender-dice' value=${targetarmor} />
+<label>Target Modifier(s):</label> <input type='number' name='target' value=0 />
+</div>
+`
 let d = new Dialog({
 title: "Attack",
 content: content,
@@ -63,8 +45,8 @@ let attackerRoll = new Roll(attackerDice);
 let defenderRoll = new Roll(defenderDice);
 await attackerRoll.roll();
 await defenderRoll.roll();
-await attackerRoll.toMessage();
-await defenderRoll.toMessage();
+//await attackerRoll.toMessage();
+//await defenderRoll.toMessage();
 async function castSpell(effect) {
     game.user.targets.forEach((i, t) => {
     canvas.fxmaster.drawSpecialToward(effect, tokens[0], t);
@@ -131,10 +113,10 @@ return Math.floor(distance);
 
 
 let targettoken1 = Array.from(game.user.targets)[0];
-let maintoken1 = canvas.tokens.controlled[0];
+//let maintoken1 = canvas.tokens.controlled[0];
 let targetdefense=targettoken1.actor.data.data.attributes.Defense.value;
-let targetarmor=targettoken1.actor.data.data.attributes.AV1.value;
-let attackmain=maintoken1.actor.data.data.attributes.Fight1.value;
+//let targetarmor=targettoken1.actor.data.data.attributes.AV1.value;
+//let attackmain=maintoken1.actor.data.data.attributes.Fight1.value;
 let tokenDistance1= tokenDistance(maintoken, targettoken);
 
 let total = 0;
