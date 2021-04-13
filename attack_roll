@@ -1,4 +1,5 @@
 /* Combined Macro Measures distance between target and character. Rolls xd12 removing matches between attacker roll and defender roll. Plays special effects on roll*/
+// Dice roll portion of macro by: BadIdeasBureau 2021, distance measuring by _space 2021, Input from several others. Visual and audio from module token magic macros. 
 //macro Red1
 //Red1 hides the dice rolls and only outputs the results to save chat window reality.
 //Red2 shows both dice rolls and shows the distance between target and shooter in the chat window - this is mostly for a dice roll audit but can be used as well.
